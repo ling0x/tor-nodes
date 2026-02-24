@@ -1,0 +1,48 @@
+name: World Map
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  map:
+    name: generate map
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}
+
+      - name: Build
+        run: cargo build --release --bin world-map
+
+      - name: Generate map
+        run: cargo run --release --bin world-map
+
+      - name: Commit map
+        run: |
+          if [ ! -f latest.map.svg ] || [ "$(diff -q latest.map.svg map.svg)" != "" ]; then
+            cp map.svg latest.map.svg
+            git add latest.map.svg
+          fi
+          if [[ `git diff --cached` ]]; then
+            git config user.name  'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m "chore: update world map" -m "[skip ci]"
+            git push
+          fi
