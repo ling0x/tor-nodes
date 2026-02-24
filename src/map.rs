@@ -9,7 +9,8 @@
 //!   red    (#f87171) — exit
 //!   yellow (#fde047) — middle
 
-use std::{collections::HashMap, fs};
+use std::{collections::HashMap, fs, io::Read};
+use flate2::read::GzDecoder;
 use serde::Deserialize;
 use serde_json::Value;
 
@@ -29,6 +30,35 @@ const R_MIDDLE:  f64 = 3.0;
 const R_NOTABLE: f64 = 4.0;
 
 // ---------------------------------------------------------------------------
+// HTTP helper — transparently decode gzip if needed
+// ---------------------------------------------------------------------------
+
+fn fetch_json<T: for<'de> Deserialize<'de>>(url: &str) -> anyhow::Result<T> {
+    let resp = ureq::get(url)
+        .set("Accept-Encoding", "gzip")
+        .set("Accept", "application/json")
+        .call()?;
+
+    let encoding = resp
+        .header("Content-Encoding")
+        .unwrap_or("")
+        .to_lowercase();
+
+    let result = if encoding.contains("gzip") {
+        let mut buf = Vec::new();
+        resp.into_reader().read_to_end(&mut buf)?;
+        let mut gz = GzDecoder::new(buf.as_slice());
+        let mut decoded = String::new();
+        gz.read_to_string(&mut decoded)?;
+        serde_json::from_str(&decoded)?
+    } else {
+        serde_json::from_reader(resp.into_reader())?
+    };
+
+    Ok(result)
+}
+
+// ---------------------------------------------------------------------------
 // Onionoo data model
 // ---------------------------------------------------------------------------
 
@@ -39,24 +69,28 @@ struct OnionooResponse {
 
 #[derive(Debug, Deserialize)]
 struct Relay {
-    flags:     Vec<String>,
+    flags:     Option<Vec<String>>,
     latitude:  Option<f64>,
     longitude: Option<f64>,
     country:   Option<String>,
 }
 
 impl Relay {
-    fn has_flag(&self, flag: &str) -> bool {
-        self.flags.iter().any(|f| f.eq_ignore_ascii_case(flag))
+    fn flags(&self) -> &[String] {
+        self.flags.as_deref().unwrap_or(&[])
     }
 
-    fn is_guard(&self) -> bool { self.has_flag("guard") }
-    fn is_exit(&self)  -> bool { self.has_flag("exit")  }
+    fn has_flag(&self, flag: &str) -> bool {
+        self.flags().iter().any(|f| f.eq_ignore_ascii_case(flag))
+    }
+
+    fn is_guard(&self) -> bool { self.has_flag("Guard") }
+    fn is_exit(&self)  -> bool { self.has_flag("Exit")  }
 
     fn dot_color(&self) -> &'static str {
         if self.is_guard()      { "#c084fc" }  // bright purple
         else if self.is_exit()  { "#f87171" }  // bright red
-        else                    { "#fde047" }  // bright yellow — high contrast on dark blue land
+        else                    { "#fde047" }  // bright yellow
     }
 
     fn dot_radius(&self) -> f64 {
@@ -140,7 +174,6 @@ fn country_counts(relays: &[Relay]) -> Vec<(String, usize)> {
 fn render_svg(relays: &[Relay], geojson: &Value) -> String {
     let mut s = String::with_capacity(4 << 20);
 
-    // header
     s.push_str(&format!(
         r#"<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}">
@@ -149,7 +182,7 @@ fn render_svg(relays: &[Relay], geojson: &Value) -> String {
 "#
     ));
 
-    // background (ocean)
+    // background
     s.push_str(&format!("  <rect width='{W}' height='{H}' fill='#0c1a2e'/>\n"));
 
     // graticule
@@ -175,7 +208,8 @@ fn render_svg(relays: &[Relay], geojson: &Value) -> String {
     }
     s.push_str("  </g>\n");
 
-    // relay dots — middles first (bottom), then guards/exits on top
+    // relay dots — middles first, guards/exits on top
+    let plotted = std::cell::Cell::new(0usize);
     s.push_str("  <g stroke='#0c1a2e' stroke-width='0.6'>\n");
     for pass in [false, true] {
         for relay in relays {
@@ -185,6 +219,7 @@ fn render_svg(relays: &[Relay], geojson: &Value) -> String {
                 (Some(lo), Some(la)) => (lo, la),
                 _ => continue,
             };
+            plotted.set(plotted.get() + 1);
             let (x, y) = project(lon, lat);
             let color  = relay.dot_color();
             let r      = relay.dot_radius();
@@ -194,6 +229,7 @@ fn render_svg(relays: &[Relay], geojson: &Value) -> String {
         }
     }
     s.push_str("  </g>\n");
+    eprintln!("[*] Plotted {} dots.", plotted.get());
 
     // legend
     let legend = [
@@ -242,14 +278,14 @@ fn render_svg(relays: &[Relay], geojson: &Value) -> String {
 
 fn main() -> anyhow::Result<()> {
     eprintln!("[*] Fetching country polygons...");
-    let geo_resp = ureq::get(GEOJSON_URL).call()?;
-    let geojson: Value = serde_json::from_reader(geo_resp.into_reader())?;
+    let geojson: Value = fetch_json(GEOJSON_URL)?;
 
     eprintln!("[*] Fetching relay list from Onionoo...");
-    let onionoo_resp = ureq::get(ONIONOO_URL).call()?;
-    let parsed: OnionooResponse = serde_json::from_reader(onionoo_resp.into_reader())?;
+    let parsed: OnionooResponse = fetch_json(ONIONOO_URL)?;
     let relays = parsed.relays;
     eprintln!("[*] Got {} relays.", relays.len());
+    eprintln!("[*] Relays with lat/lon: {}",
+        relays.iter().filter(|r| r.latitude.is_some()).count());
 
     let svg = render_svg(&relays, &geojson);
     fs::write("map.svg", &svg)?;
