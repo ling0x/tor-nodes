@@ -10,8 +10,15 @@
 //!   purple (#c084fc) — guard
 //!   red    (#f87171) — exit
 //!   yellow (#fde047) — middle
+//!
+//! Latitude/longitude resolution order:
+//!   1. Onionoo `latitude` / `longitude` fields (present for most relays)
+//!   2. MaxMind GeoLite2-City lookup on the relay's first OR-address IP
+//!      (fallback for relays where Onionoo returns null coordinates)
 
-use std::{collections::HashMap, fs, io::Read};
+mod geo;
+
+use std::{collections::HashMap, fs, io::Read, net::IpAddr, str::FromStr};
 use serde::Deserialize;
 use serde_json::Value;
 
@@ -37,10 +44,11 @@ struct OnionooResponse {
 
 #[derive(Debug, Deserialize)]
 struct Relay {
-    flags:     Option<Vec<String>>,
-    latitude:  Option<f64>,
-    longitude: Option<f64>,
-    country:   Option<String>,
+    flags:        Option<Vec<String>>,
+    or_addresses: Option<Vec<String>>,
+    latitude:     Option<f64>,
+    longitude:    Option<f64>,
+    country:      Option<String>,
 }
 
 impl Relay {
@@ -63,6 +71,43 @@ impl Relay {
 
     fn dot_radius(&self) -> f64 {
         if self.is_guard() || self.is_exit() { R_NOTABLE } else { R_MIDDLE }
+    }
+
+    /// Parse the first OR-address string into an `IpAddr`, ignoring the port.
+    ///
+    /// Onionoo uses two formats:
+    ///   IPv4 — `"1.2.3.4:9001"`
+    ///   IPv6 — `"[dead:beef::1]:443"`
+    fn primary_ip(&self) -> Option<IpAddr> {
+        let addr = self.or_addresses.as_deref()?.first()?;
+        parse_ip(addr)
+    }
+
+    /// Resolve (latitude, longitude) for this relay.
+    ///
+    /// Tries Onionoo fields first; falls back to a MaxMind GeoLite2-City
+    /// lookup when those are absent.
+    pub fn resolve_position(&self) -> Option<(f64, f64)> {
+        // 1. Onionoo native fields.
+        if let (Some(lat), Some(lon)) = (self.latitude, self.longitude) {
+            return Some((lat, lon));
+        }
+        // 2. MaxMind GeoLite2-City fallback.
+        let ip = self.primary_ip()?;
+        geo::lookup(ip)
+    }
+}
+
+/// Strip the port from an Onionoo OR-address string and return the IP.
+fn parse_ip(addr: &str) -> Option<IpAddr> {
+    if let Some(inner) = addr.strip_prefix('[') {
+        // IPv6: "[dead:beef::1]:443"
+        let (ip_str, _rest) = inner.split_once(']')?;
+        IpAddr::from_str(ip_str).ok()
+    } else {
+        // IPv4: "1.2.3.4:9001"
+        let (ip_str, _port) = addr.rsplit_once(':')?;
+        IpAddr::from_str(ip_str).ok()
     }
 }
 
@@ -176,16 +221,24 @@ fn render_svg(relays: &[Relay], geojson: &Value) -> String {
     s.push_str("  </g>\n");
 
     // relay dots — middles first, then guards/exits on top
-    let mut plotted = 0usize;
+    let mut plotted   = 0usize;
+    let mut from_mmdb = 0usize;
     s.push_str("  <g stroke='#0c1a2e' stroke-width='0.6'>\n");
     for pass in [false, true] {
         for relay in relays {
             let notable = relay.is_guard() || relay.is_exit();
             if notable != pass { continue; }
-            let (lon, lat) = match (relay.longitude, relay.latitude) {
-                (Some(lo), Some(la)) => (lo, la),
-                _ => continue,
+
+            let (lat, lon) = match relay.resolve_position() {
+                Some(pos) => pos,
+                None => continue,
             };
+
+            // Count how many positions came from the GeoLite2 fallback.
+            if relay.latitude.is_none() {
+                from_mmdb += 1;
+            }
+
             plotted += 1;
             let (x, y) = project(lon, lat);
             let color  = relay.dot_color();
@@ -196,7 +249,7 @@ fn render_svg(relays: &[Relay], geojson: &Value) -> String {
         }
     }
     s.push_str("  </g>\n");
-    eprintln!("[*] Plotted {plotted} dots.");
+    eprintln!("[*] Plotted {plotted} dots ({from_mmdb} resolved via GeoLite2 fallback).");
 
     // legend
     let legend = [("#fde047", "Middle"), ("#c084fc", "Guard"), ("#f87171", "Exit")];
@@ -243,8 +296,6 @@ fn main() -> anyhow::Result<()> {
     let geojson: Value = serde_json::from_str(WORLD_GEOJSON)?;
 
     eprintln!("[*] Fetching relay list from Onionoo...");
-    // With default-features = false, ureq has no gzip middleware at all.
-    // The server will send plain JSON since we don't advertise gzip support.
     let resp = ureq::get(ONIONOO_URL).call()?;
     let mut body = String::new();
     resp.into_reader().read_to_string(&mut body)?;
@@ -252,7 +303,7 @@ fn main() -> anyhow::Result<()> {
     let parsed: OnionooResponse = serde_json::from_str(&body)?;
     let relays = parsed.relays;
     eprintln!("[*] Got {} relays.", relays.len());
-    eprintln!("[*] Relays with lat/lon: {}",
+    eprintln!("[*] Relays with Onionoo lat/lon: {}",
         relays.iter().filter(|r| r.latitude.is_some()).count());
 
     let svg = render_svg(&relays, &geojson);
