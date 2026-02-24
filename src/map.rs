@@ -240,16 +240,15 @@ fn render_svg(relays: &[Relay], geojson: &Value) -> String {
 // ---------------------------------------------------------------------------
 
 fn main() -> anyhow::Result<()> {
-    // GeoJSON is embedded — parse from the static string.
     let geojson: Value = serde_json::from_str(WORLD_GEOJSON)?;
 
     eprintln!("[*] Fetching relay list from Onionoo...");
-    let resp = ureq::get(ONIONOO_URL)
-        .set("Accept-Encoding", "identity")  // plain JSON, no gzip
-        .call()?;
-
+    // With default-features = false, ureq has no gzip middleware at all.
+    // The server will send plain JSON since we don't advertise gzip support.
+    let resp = ureq::get(ONIONOO_URL).call()?;
     let mut body = String::new();
     resp.into_reader().read_to_string(&mut body)?;
+
     let parsed: OnionooResponse = serde_json::from_str(&body)?;
     let relays = parsed.relays;
     eprintln!("[*] Got {} relays.", relays.len());
