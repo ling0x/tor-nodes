@@ -45,3 +45,7 @@ The same Onionoo API exposes several other endpoints for running relays worth tr
 | [`/weights`](https://onionoo.torproject.org/weights?search=type:relay%20running:true) | Consensus weight fractions — probability each relay is selected for guard, middle, or exit position |
 | [`/uptime`](https://onionoo.torproject.org/uptime?search=type:relay%20running:true) | Historical uptime fractions per relay across the same time windows |
 | [`/details`](https://onionoo.torproject.org/details?search=type:relay%20running:true) *(current)* | Full relay metadata: flags, GeoIP country/AS, Tor version, exit policy, family, bandwidth caps |
+
+## References
+
+- [Hiding Routing Information](https://www.onion-router.net/Publications.html#IH-1996) — D. Goldschlag, M. Reed, P. Syverson (1996). The original onion routing paper describing layered encryption and anonymous communication through a network of routing nodes.
