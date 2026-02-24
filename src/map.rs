@@ -12,7 +12,6 @@
 
 use std::{
     collections::HashMap,
-    fmt::Write as FmtWrite,
     fs,
 };
 
@@ -25,14 +24,9 @@ use serde::Deserialize;
 const ONIONOO_URL: &str =
     "https://onionoo.torproject.org/details?search=type:relay%20running:true";
 
-/// SVG canvas dimensions (px).
 const W: f64 = 1200.0;
 const H: f64 = 600.0;
-
-/// Dot radius per relay (px).
 const R: f64 = 2.2;
-
-/// Dot opacity — overlapping dots stay visible but don't fully saturate.
 const OPACITY: f64 = 0.75;
 
 // ---------------------------------------------------------------------------
@@ -47,11 +41,8 @@ struct OnionooResponse {
 #[derive(Debug, Deserialize)]
 struct Relay {
     flags: Vec<String>,
-    /// Decimal latitude — present on most relays, absent on a small minority.
     latitude: Option<f64>,
-    /// Decimal longitude.
     longitude: Option<f64>,
-    /// ISO 3166-1 alpha-2 country code (lower-case).
     country: Option<String>,
 }
 
@@ -61,32 +52,24 @@ impl Relay {
     }
 
     fn dot_color(&self) -> &'static str {
-        if self.has_flag("guard") {
-            "#a855f7" // purple
-        } else if self.has_flag("exit") {
-            "#ef4444" // red
-        } else {
-            "#22d3ee" // cyan — middle
-        }
+        if self.has_flag("guard")      { "#a855f7" }
+        else if self.has_flag("exit")  { "#ef4444" }
+        else                           { "#22d3ee" }
     }
 }
 
 // ---------------------------------------------------------------------------
-// Projection  (equirectangular / plate carrée)
+// Projection (equirectangular)
 // ---------------------------------------------------------------------------
 
-/// Map (lon, lat) in degrees to SVG (x, y) pixel coordinates.
-///
-/// lon ∈ [-180, 180] → x ∈ [0, W]
-/// lat ∈ [ -90,  90] → y ∈ [H, 0]  (SVG y-axis is inverted)
 fn project(lon: f64, lat: f64) -> (f64, f64) {
     let x = (lon + 180.0) / 360.0 * W;
-    let y = (90.0 - lat) / 180.0 * H;
+    let y = (90.0  - lat) / 180.0 * H;
     (x, y)
 }
 
 // ---------------------------------------------------------------------------
-// Country relay counts for tooltip / legend
+// Country counts
 // ---------------------------------------------------------------------------
 
 fn country_counts(relays: &[Relay]) -> Vec<(String, usize)> {
@@ -102,124 +85,110 @@ fn country_counts(relays: &[Relay]) -> Vec<(String, usize)> {
 }
 
 // ---------------------------------------------------------------------------
+// SVG helpers — every attribute value goes through these so there is
+// no manual quote escaping anywhere in the rendering code.
+// ---------------------------------------------------------------------------
+
+/// Append a self-closing SVG element with pre-formatted attributes.
+macro_rules! elem {
+    ($buf:expr, $tag:expr, $attrs:expr) => {
+        $buf.push_str(&format!("  <{} {}/>\n", $tag, $attrs));
+    };
+}
+
+/// Append a full SVG element with inner text.
+macro_rules! elem_text {
+    ($buf:expr, $tag:expr, $attrs:expr, $inner:expr) => {
+        $buf.push_str(&format!("  <{0} {1}>{2}</{0}>\n", $tag, $attrs, $inner));
+    };
+}
+
+// ---------------------------------------------------------------------------
 // SVG rendering
 // ---------------------------------------------------------------------------
 
 fn render_svg(relays: &[Relay]) -> String {
-    let mut svg = String::with_capacity(1 << 20); // 1 MB initial
+    let mut s = String::with_capacity(1 << 20);
 
-    // ---- header ------------------------------------------------------------
-    writeln!(
-        svg,
+    // header
+    s.push_str(&format!(
         r#"<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg"
-     width="{W}" height="{H}"
-     viewBox="0 0 {W} {H}">
+<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}">
   <title>Tor Relay World Map</title>
-  <desc>Live Tor relay positions from Onionoo. Guards: purple, Exits: red, Middles: cyan.</desc>"""
-    )
-    .unwrap();
+  <desc>Live Tor relay positions. Guards: purple, Exits: red, Middles: cyan.</desc>
+"#
+    ));
 
-    // ---- background --------------------------------------------------------
-    writeln!(
-        svg,
-        "  <rect width=\"{W}\" height=\"{H}\" fill=\"#0f172a\"/>"
-    )
-    .unwrap();
+    // background
+    elem!(s, "rect", format!("width='{W}' height='{H}' fill='#0f172a'"));
 
-    // ---- graticule (grid lines every 30°) ----------------------------------
-    svg.push_str("  <g stroke=\"#1e293b\" stroke-width=\"0.5\">\n");
+    // graticule
+    s.push_str("  <g stroke='#1e293b' stroke-width='0.5'>\n");
     for lon in (-180..=180).step_by(30) {
         let (x, _) = project(lon as f64, 0.0);
-        writeln!(svg, "    <line x1=\"{x:.1}\" y1=\"0\" x2=\"{x:.1}\" y2=\"{H}\"/>").unwrap();
+        s.push_str(&format!("    <line x1='{x:.1}' y1='0' x2='{x:.1}' y2='{H}'/>\n"));
     }
     for lat in (-90..=90).step_by(30) {
         let (_, y) = project(0.0, lat as f64);
-        writeln!(svg, "    <line x1=\"0\" y1=\"{y:.1}\" x2=\"{W}\" y2=\"{y:.1}\"/>").unwrap();
+        s.push_str(&format!("    <line x1='0' y1='{y:.1}' x2='{W}' y2='{y:.1}'/>\n"));
     }
-    svg.push_str("  </g>\n");
+    s.push_str("  </g>\n");
 
-    // ---- relay dots --------------------------------------------------------
-    svg.push_str("  <g>\n");
-    // Draw middles first so guards/exits render on top.
+    // relay dots — middles first, then guards/exits on top
+    s.push_str("  <g>\n");
     for pass in [false, true] {
         for relay in relays {
-            let is_notable = relay.has_flag("guard") || relay.has_flag("exit");
-            if is_notable != pass {
-                continue;
-            }
+            let notable = relay.has_flag("guard") || relay.has_flag("exit");
+            if notable != pass { continue; }
             let (lon, lat) = match (relay.longitude, relay.latitude) {
                 (Some(lo), Some(la)) => (lo, la),
                 _ => continue,
             };
             let (x, y) = project(lon, lat);
-            let color = relay.dot_color();
-            writeln!(
-                svg,
-                "    <circle cx=\"{x:.1}\" cy=\"{y:.1}\" r=\"{R}\" fill=\"{color}\" opacity=\"{OPACITY}\"/>"
-            )
-            .unwrap();
+            let color  = relay.dot_color();
+            s.push_str(&format!(
+                "    <circle cx='{x:.1}' cy='{y:.1}' r='{R}' fill='{color}' opacity='{OPACITY}'/>\n"
+            ));
         }
     }
-    svg.push_str("  </g>\n");
+    s.push_str("  </g>\n");
 
-    // ---- legend ------------------------------------------------------------
-    let legend = [
-        ("#22d3ee", "Middle"),
-        ("#a855f7", "Guard"),
-        ("#ef4444", "Exit"),
-    ];
+    // legend
+    let legend = [("#22d3ee", "Middle"), ("#a855f7", "Guard"), ("#ef4444", "Exit")];
     let lx = 16.0_f64;
     let mut ly = H - 70.0;
-    svg.push_str("  <g font-family=\"monospace\" font-size=\"11\" fill=\"#cbd5e1\">\n");
+    s.push_str("  <g font-family='monospace' font-size='11' fill='#cbd5e1'>\n");
     for (color, label) in &legend {
-        writeln!(
-            svg,
-            "    <circle cx=\"{:.1}\" cy=\"{:.1}\" r=\"5\" fill=\"{color}\"/>",
-            lx + 5.0,
-            ly
-        )
-        .unwrap();
-        writeln!(
-            svg,
-            "    <text x=\"{:.1}\" y=\"{:.1}\">{label}</text>",
-            lx + 14.0,
-            ly + 4.0
-        )
-        .unwrap();
+        s.push_str(&format!("    <circle cx='{:.1}' cy='{ly:.1}' r='5' fill='{color}'/>\n", lx + 5.0));
+        s.push_str(&format!("    <text x='{:.1}' y='{:.1}'>{label}</text>\n", lx + 14.0, ly + 4.0));
         ly += 18.0;
     }
 
-    // relay counts
     let total   = relays.len();
     let guards  = relays.iter().filter(|r| r.has_flag("guard")).count();
     let exits   = relays.iter().filter(|r| r.has_flag("exit")).count();
-    let middles = total - guards - exits;
-    writeln!(
-        svg,
-        "    <text x=\"{:.1}\" y=\"{:.1}\" fill=\"#64748b\">total: {total}  guards: {guards}  exits: {exits}  middles: {middles}</text>",
-        lx,
+    let middles = total.saturating_sub(guards + exits);
+    s.push_str(&format!(
+        "    <text x='{lx:.1}' y='{:.1}' fill='#64748b'>total: {total}  guards: {guards}  exits: {exits}  middles: {middles}</text>\n",
         H - 10.0
-    )
-    .unwrap();
-    svg.push_str("  </g>\n");
+    ));
+    s.push_str("  </g>\n");
 
-    // ---- top-10 countries sidebar -----------------------------------------
+    // top-10 countries
     let counts = country_counts(relays);
     let cx = W - 90.0;
     let mut cy = 20.0_f64;
-    svg.push_str("  <g font-family=\"monospace\" font-size=\"10\" fill=\"#94a3b8\">\n");
-    writeln!(svg, "    <text x=\"{cx:.1}\" y=\"{cy:.1}\" font-size=\"11\" fill=\"#cbd5e1\">Top countries</text>").unwrap();
+    s.push_str("  <g font-family='monospace' font-size='10' fill='#94a3b8'>\n");
+    s.push_str(&format!("    <text x='{cx:.1}' y='{cy:.1}' font-size='11' fill='#cbd5e1'>Top countries</text>\n"));
     cy += 14.0;
     for (cc, count) in counts.iter().take(10) {
-        writeln!(svg, "    <text x=\"{cx:.1}\" y=\"{cy:.1}\">{cc}  {count}</text>").unwrap();
+        s.push_str(&format!("    <text x='{cx:.1}' y='{cy:.1}'>{cc}  {count}</text>\n"));
         cy += 12.0;
     }
-    svg.push_str("  </g>\n");
+    s.push_str("  </g>\n");
 
-    // ---- footer ------------------------------------------------------------
-    svg.push_str("</svg>\n");
-    svg
+    s.push_str("</svg>\n");
+    s
 }
 
 // ---------------------------------------------------------------------------
