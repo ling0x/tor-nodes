@@ -1,0 +1,56 @@
+name: Sync
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    name: sync
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}
+
+      - name: Build
+        run: cargo build --release
+
+      - name: Get data
+        run: cargo run --release
+
+      - name: Push data
+        run: |
+          if [ ! -f latest.all.csv ] || [ "$(diff -q latest.all.csv all.csv)" != "" ]; then
+            cp all.csv latest.all.csv
+            git add latest.all.csv
+          fi
+          if [ ! -f latest.guards.csv ] || [ "$(diff -q latest.guards.csv guards.csv)" != "" ]; then
+            cp guards.csv latest.guards.csv
+            git add latest.guards.csv
+          fi
+          if [ ! -f latest.exits.csv ] || [ "$(diff -q latest.exits.csv exits.csv)" != "" ]; then
+            cp exits.csv latest.exits.csv
+            git add latest.exits.csv
+          fi
+          if [[ `git diff --cached` ]]; then
+            git config user.name  'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m "chore: auto sync" -m "[skip ci]"
+            git push
+          fi
