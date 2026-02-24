@@ -5,9 +5,9 @@
 //! Output: `map.svg`  (equirectangular / plate carrée projection)
 //!
 //! Dot colours:
-//!   purple (#a855f7) — guard
-//!   red    (#ef4444) — exit
-//!   yellow (#facc15) — middle
+//!   purple (#c084fc) — guard
+//!   red    (#f87171) — exit
+//!   yellow (#fde047) — middle
 
 use std::{collections::HashMap, fs};
 use serde::Deserialize;
@@ -25,8 +25,6 @@ const GEOJSON_URL: &str =
 
 const W: f64 = 1200.0;
 const H: f64 = 600.0;
-
-// Dot sizes: notable (guard/exit) are larger than middles
 const R_MIDDLE:  f64 = 3.0;
 const R_NOTABLE: f64 = 4.0;
 
@@ -52,13 +50,13 @@ impl Relay {
         self.flags.iter().any(|f| f.eq_ignore_ascii_case(flag))
     }
 
-    fn is_guard(&self)  -> bool { self.has_flag("guard") }
-    fn is_exit(&self)   -> bool { self.has_flag("exit")  }
+    fn is_guard(&self) -> bool { self.has_flag("guard") }
+    fn is_exit(&self)  -> bool { self.has_flag("exit")  }
 
     fn dot_color(&self) -> &'static str {
-        if   self.is_guard() { "#c084fc" }  // bright purple
-        elif self.is_exit()  { "#f87171" }  // bright red
-        else                 { "#fde047" }  // bright yellow — high contrast on dark blue land
+        if self.is_guard()      { "#c084fc" }  // bright purple
+        else if self.is_exit()  { "#f87171" }  // bright red
+        else                    { "#fde047" }  // bright yellow — high contrast on dark blue land
     }
 
     fn dot_radius(&self) -> f64 {
@@ -166,7 +164,7 @@ fn render_svg(relays: &[Relay], geojson: &Value) -> String {
     }
     s.push_str("  </g>\n");
 
-    // country polygons — noticeably lighter than the ocean so dots are visible on both
+    // country polygons
     s.push_str("  <g fill='#1d3461' stroke='#2d4a7a' stroke-width='0.5'>\n");
     if let Some(features) = geojson["features"].as_array() {
         for feature in features {
@@ -177,9 +175,7 @@ fn render_svg(relays: &[Relay], geojson: &Value) -> String {
     }
     s.push_str("  </g>\n");
 
-    // relay dots
-    // Pass 0: middles (bottom layer)
-    // Pass 1: guards/exits (top layer, larger)
+    // relay dots — middles first (bottom), then guards/exits on top
     s.push_str("  <g stroke='#0c1a2e' stroke-width='0.6'>\n");
     for pass in [false, true] {
         for relay in relays {
