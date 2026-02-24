@@ -24,8 +24,6 @@ struct TorNode {
 }
 
 impl TorNode {
-    /// Returns CSV rows for every OR address:
-    /// `<fingerprint>, <ip>, <port>`
     fn to_csv_rows(&self) -> Vec<String> {
         self.or_addresses
             .iter()
@@ -46,8 +44,8 @@ impl TorNode {
 /// Parse an OR address string like `"1.2.3.4:9001"` or `"[::1]:9001"`
 /// into `(IpAddr, u16)`.
 fn parse_or_address(addr: &str) -> Option<(IpAddr, u16)> {
-    // IPv6 addresses come wrapped in brackets: [dead:beef::1]:443
     if addr.starts_with('[') {
+        // IPv6: [dead:beef::1]:443
         let close = addr.find(']')?;
         let ip_str = &addr[1..close];
         let rest = &addr[close + 1..];
@@ -66,35 +64,37 @@ fn parse_or_address(addr: &str) -> Option<(IpAddr, u16)> {
     }
 }
 
-/// The top-level JSON object returned by the Onionoo API.
-/// We only care about the `relays` array; everything else is ignored.
+/// Top-level Onionoo response — only `relays` is needed.
 #[derive(Debug, Deserialize)]
 struct OnionooResponse {
     relays: Vec<TorNode>,
 }
 
 fn main() -> anyhow::Result<()> {
-    eprintln!("[*] Fetching relay list from Onionoo…");
-    let body = ureq::get(ONIONOO_URL).call()?.into_string()?;
+    eprintln!("[*] Fetching relay list from Onionoo...");
 
-    eprintln!("[*] Parsing JSON…");
-    let response: OnionooResponse = serde_json::from_str(&body)?;
-    let nodes = response.relays;
+    // Stream the response body directly into serde_json so we never
+    // materialise the entire payload as a String (avoids ureq's
+    // default 10 MB into_string() cap on a ~15 MB response).
+    let response = ureq::get(ONIONOO_URL).call()?;
+    let reader = response.into_reader();
+    let parsed: OnionooResponse = serde_json::from_reader(reader)?;
+    let nodes = parsed.relays;
+
     eprintln!("[*] Got {} relays.", nodes.len());
 
-    // Write to temp files then atomically rename.
-    let all_tmp = format!("{}.tmp", ALL_CSV);
-    let guards_tmp = format!("{}.tmp", GUARDS_CSV);
-    let exits_tmp = format!("{}.tmp", EXITS_CSV);
+    // Write to .tmp files first, then atomically rename.
+    let all_tmp     = format!("{}.tmp", ALL_CSV);
+    let guards_tmp  = format!("{}.tmp", GUARDS_CSV);
+    let exits_tmp   = format!("{}.tmp", EXITS_CSV);
 
     {
-        let mut all_w = csv_writer(&all_tmp)?;
+        let mut all_w    = csv_writer(&all_tmp)?;
         let mut guards_w = csv_writer(&guards_tmp)?;
-        let mut exits_w = csv_writer(&exits_tmp)?;
+        let mut exits_w  = csv_writer(&exits_tmp)?;
 
         for node in &nodes {
-            let rows = node.to_csv_rows();
-            for row in &rows {
+            for row in node.to_csv_rows() {
                 writeln!(all_w, "{}", row)?;
                 if node.is_guard() {
                     writeln!(guards_w, "{}", row)?;
@@ -110,11 +110,11 @@ fn main() -> anyhow::Result<()> {
         exits_w.flush()?;
     }
 
-    fs::rename(&all_tmp, ALL_CSV)?;
+    fs::rename(&all_tmp,    ALL_CSV)?;
     fs::rename(&guards_tmp, GUARDS_CSV)?;
-    fs::rename(&exits_tmp, EXITS_CSV)?;
+    fs::rename(&exits_tmp,  EXITS_CSV)?;
 
-    eprintln!("[*] Done — wrote {}, {}, {}.", ALL_CSV, GUARDS_CSV, EXITS_CSV);
+    eprintln!("[*] Done - wrote {}, {}, {}.", ALL_CSV, GUARDS_CSV, EXITS_CSV);
     Ok(())
 }
 

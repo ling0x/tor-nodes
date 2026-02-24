@@ -1,7 +1,5 @@
 # tor-nodes
 
-A Rust rewrite of [alireza-rezaee/tor-nodes](https://github.com/alireza-rezaee/tor-nodes).
-
 Fetches the live Tor relay list from the [Onionoo API](https://metrics.torproject.org/onionoo.html) and outputs three CSV files:
 
 | File | Contents |
