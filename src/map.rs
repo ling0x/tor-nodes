@@ -1,7 +1,9 @@
 //! world-map — fetch live Tor relay positions from Onionoo and render
 //! a self-contained SVG world map coloured by relay type.
 //!
-//! Fetches Natural Earth 110m GeoJSON at runtime for country polygons.
+//! Country polygons are embedded at compile time from assets/world.geojson
+//! (Natural Earth 110m, downloaded once by build.rs).
+//!
 //! Output: `map.svg`  (equirectangular / plate carrée projection)
 //!
 //! Dot colours:
@@ -10,53 +12,19 @@
 //!   yellow (#fde047) — middle
 
 use std::{collections::HashMap, fs, io::Read};
-use flate2::read::GzDecoder;
 use serde::Deserialize;
 use serde_json::Value;
 
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
+// Embedded at compile time — no runtime fetch needed.
+const WORLD_GEOJSON: &str = include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/assets/world.geojson"));
 
 const ONIONOO_URL: &str =
     "https://onionoo.torproject.org/details?search=type:relay%20running:true";
-
-const GEOJSON_URL: &str =
-    "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson";
 
 const W: f64 = 1200.0;
 const H: f64 = 600.0;
 const R_MIDDLE:  f64 = 3.0;
 const R_NOTABLE: f64 = 4.0;
-
-// ---------------------------------------------------------------------------
-// HTTP helper — transparently decode gzip if needed
-// ---------------------------------------------------------------------------
-
-fn fetch_json<T: for<'de> Deserialize<'de>>(url: &str) -> anyhow::Result<T> {
-    let resp = ureq::get(url)
-        .set("Accept-Encoding", "gzip")
-        .set("Accept", "application/json")
-        .call()?;
-
-    let encoding = resp
-        .header("Content-Encoding")
-        .unwrap_or("")
-        .to_lowercase();
-
-    let result = if encoding.contains("gzip") {
-        let mut buf = Vec::new();
-        resp.into_reader().read_to_end(&mut buf)?;
-        let mut gz = GzDecoder::new(buf.as_slice());
-        let mut decoded = String::new();
-        gz.read_to_string(&mut decoded)?;
-        serde_json::from_str(&decoded)?
-    } else {
-        serde_json::from_reader(resp.into_reader())?
-    };
-
-    Ok(result)
-}
 
 // ---------------------------------------------------------------------------
 // Onionoo data model
@@ -88,9 +56,9 @@ impl Relay {
     fn is_exit(&self)  -> bool { self.has_flag("Exit")  }
 
     fn dot_color(&self) -> &'static str {
-        if self.is_guard()      { "#c084fc" }  // bright purple
-        else if self.is_exit()  { "#f87171" }  // bright red
-        else                    { "#fde047" }  // bright yellow
+        if self.is_guard()      { "#c084fc" }
+        else if self.is_exit()  { "#f87171" }
+        else                    { "#fde047" }
     }
 
     fn dot_radius(&self) -> f64 {
@@ -182,7 +150,6 @@ fn render_svg(relays: &[Relay], geojson: &Value) -> String {
 "#
     ));
 
-    // background
     s.push_str(&format!("  <rect width='{W}' height='{H}' fill='#0c1a2e'/>\n"));
 
     // graticule
@@ -197,7 +164,7 @@ fn render_svg(relays: &[Relay], geojson: &Value) -> String {
     }
     s.push_str("  </g>\n");
 
-    // country polygons
+    // country polygons (embedded)
     s.push_str("  <g fill='#1d3461' stroke='#2d4a7a' stroke-width='0.5'>\n");
     if let Some(features) = geojson["features"].as_array() {
         for feature in features {
@@ -208,8 +175,8 @@ fn render_svg(relays: &[Relay], geojson: &Value) -> String {
     }
     s.push_str("  </g>\n");
 
-    // relay dots — middles first, guards/exits on top
-    let plotted = std::cell::Cell::new(0usize);
+    // relay dots — middles first, then guards/exits on top
+    let mut plotted = 0usize;
     s.push_str("  <g stroke='#0c1a2e' stroke-width='0.6'>\n");
     for pass in [false, true] {
         for relay in relays {
@@ -219,7 +186,7 @@ fn render_svg(relays: &[Relay], geojson: &Value) -> String {
                 (Some(lo), Some(la)) => (lo, la),
                 _ => continue,
             };
-            plotted.set(plotted.get() + 1);
+            plotted += 1;
             let (x, y) = project(lon, lat);
             let color  = relay.dot_color();
             let r      = relay.dot_radius();
@@ -229,14 +196,10 @@ fn render_svg(relays: &[Relay], geojson: &Value) -> String {
         }
     }
     s.push_str("  </g>\n");
-    eprintln!("[*] Plotted {} dots.", plotted.get());
+    eprintln!("[*] Plotted {plotted} dots.");
 
     // legend
-    let legend = [
-        ("#fde047", "Middle"),
-        ("#c084fc", "Guard"),
-        ("#f87171", "Exit"),
-    ];
+    let legend = [("#fde047", "Middle"), ("#c084fc", "Guard"), ("#f87171", "Exit")];
     let lx = 16.0_f64;
     let mut ly = H - 70.0;
     s.push_str("  <g font-family='monospace' font-size='12' fill='#e2e8f0'>\n");
@@ -277,11 +240,17 @@ fn render_svg(relays: &[Relay], geojson: &Value) -> String {
 // ---------------------------------------------------------------------------
 
 fn main() -> anyhow::Result<()> {
-    eprintln!("[*] Fetching country polygons...");
-    let geojson: Value = fetch_json(GEOJSON_URL)?;
+    // GeoJSON is embedded — parse from the static string.
+    let geojson: Value = serde_json::from_str(WORLD_GEOJSON)?;
 
     eprintln!("[*] Fetching relay list from Onionoo...");
-    let parsed: OnionooResponse = fetch_json(ONIONOO_URL)?;
+    let resp = ureq::get(ONIONOO_URL)
+        .set("Accept-Encoding", "identity")  // plain JSON, no gzip
+        .call()?;
+
+    let mut body = String::new();
+    resp.into_reader().read_to_string(&mut body)?;
+    let parsed: OnionooResponse = serde_json::from_str(&body)?;
     let relays = parsed.relays;
     eprintln!("[*] Got {} relays.", relays.len());
     eprintln!("[*] Relays with lat/lon: {}",
