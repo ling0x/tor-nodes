@@ -7,14 +7,23 @@ use std::{
 
 use serde::Deserialize;
 
+// ---------------------------------------------------------------------------
+// Constants
+// ---------------------------------------------------------------------------
+
 const ONIONOO_URL: &str =
     "https://onionoo.torproject.org/details?search=type:relay%20running:true";
 
-const ALL_CSV: &str = "all.csv";
-const GUARDS_CSV: &str = "guards.csv";
-const EXITS_CSV: &str = "exits.csv";
+const CSV_HEADER: &str = "fingerprint,ipaddr,port";
 
-const CSV_HEADER: &str = "fingerprint, ipaddr, port";
+// ---------------------------------------------------------------------------
+// Data model
+// ---------------------------------------------------------------------------
+
+#[derive(Debug, Deserialize)]
+struct OnionooResponse {
+    relays: Vec<TorNode>,
+}
 
 #[derive(Debug, Deserialize)]
 struct TorNode {
@@ -24,103 +33,102 @@ struct TorNode {
 }
 
 impl TorNode {
-    fn to_csv_rows(&self) -> Vec<String> {
+    fn has_flag(&self, flag: &str) -> bool {
+        self.flags.iter().any(|f| f.eq_ignore_ascii_case(flag))
+    }
+
+    /// Yields one CSV row per OR address: `fingerprint,ipaddr,port`
+    /// No spaces — compliant with RFC 4180 / Wikipedia CSV basic rules.
+    fn csv_rows(&self) -> impl Iterator<Item = String> + '_ {
         self.or_addresses
             .iter()
             .filter_map(|addr| parse_or_address(addr))
-            .map(|(ip, port)| format!("{}, {}, {}", self.fingerprint, ip, port))
-            .collect()
-    }
-
-    fn is_guard(&self) -> bool {
-        self.flags.iter().any(|f| f.eq_ignore_ascii_case("guard"))
-    }
-
-    fn is_exit(&self) -> bool {
-        self.flags.iter().any(|f| f.eq_ignore_ascii_case("exit"))
+            .map(|(ip, port)| format!("{},{},{}", self.fingerprint, ip, port))
     }
 }
 
-/// Parse an OR address string like `"1.2.3.4:9001"` or `"[::1]:9001"`
-/// into `(IpAddr, u16)`.
+// ---------------------------------------------------------------------------
+// Address parsing
+// ---------------------------------------------------------------------------
+
+/// Parse an Onionoo OR-address string into `(IpAddr, port)`.
+///
+/// Onionoo uses two formats:
+///   IPv4 — `"1.2.3.4:9001"`
+///   IPv6 — `"[dead:beef::1]:443"`
 fn parse_or_address(addr: &str) -> Option<(IpAddr, u16)> {
-    if addr.starts_with('[') {
-        // IPv6: [dead:beef::1]:443
-        let close = addr.find(']')?;
-        let ip_str = &addr[1..close];
-        let rest = &addr[close + 1..];
-        let port_str = rest.strip_prefix(':')?.trim();
-        let ip = IpAddr::from_str(ip_str).ok()?;
-        let port = port_str.parse::<u16>().ok()?;
-        Some((ip, port))
+    if let Some(addr) = addr.strip_prefix('[') {
+        // IPv6
+        let (ip_str, rest) = addr.split_once(']')?;
+        let port_str = rest.strip_prefix(':')?;
+        Some((IpAddr::from_str(ip_str).ok()?, port_str.parse().ok()?))
     } else {
-        // IPv4: 1.2.3.4:9001
-        let mut parts = addr.rsplitn(2, ':');
-        let port_str = parts.next()?.trim();
-        let ip_str = parts.next()?.trim();
-        let ip = IpAddr::from_str(ip_str).ok()?;
-        let port = port_str.parse::<u16>().ok()?;
-        Some((ip, port))
+        // IPv4
+        let (ip_str, port_str) = addr.rsplit_once(':')?;
+        Some((IpAddr::from_str(ip_str).ok()?, port_str.parse().ok()?))
     }
 }
 
-/// Top-level Onionoo response — only `relays` is needed.
-#[derive(Debug, Deserialize)]
-struct OnionooResponse {
-    relays: Vec<TorNode>,
+// ---------------------------------------------------------------------------
+// CSV output
+// ---------------------------------------------------------------------------
+
+struct CsvOutput {
+    path: &'static str,
+    tmp_path: String,
+    writer: BufWriter<File>,
 }
+
+impl CsvOutput {
+    fn create(path: &'static str) -> anyhow::Result<Self> {
+        let tmp_path = format!("{path}.tmp");
+        let mut writer = BufWriter::new(File::create(&tmp_path)?);
+        writeln!(writer, "{CSV_HEADER}")?;
+        Ok(Self { path, tmp_path, writer })
+    }
+
+    fn write_row(&mut self, row: &str) -> anyhow::Result<()> {
+        writeln!(self.writer, "{row}")?;
+        Ok(())
+    }
+
+    fn finalise(mut self) -> anyhow::Result<()> {
+        self.writer.flush()?;
+        fs::rename(&self.tmp_path, self.path)?;
+        Ok(())
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Entry point
+// ---------------------------------------------------------------------------
 
 fn main() -> anyhow::Result<()> {
     eprintln!("[*] Fetching relay list from Onionoo...");
-
-    // Stream the response body directly into serde_json so we never
-    // materialise the entire payload as a String (avoids ureq's
-    // default 10 MB into_string() cap on a ~15 MB response).
     let response = ureq::get(ONIONOO_URL).call()?;
-    let reader = response.into_reader();
-    let parsed: OnionooResponse = serde_json::from_reader(reader)?;
+    let parsed: OnionooResponse = serde_json::from_reader(response.into_reader())?;
     let nodes = parsed.relays;
-
     eprintln!("[*] Got {} relays.", nodes.len());
 
-    // Write to .tmp files first, then atomically rename.
-    let all_tmp     = format!("{}.tmp", ALL_CSV);
-    let guards_tmp  = format!("{}.tmp", GUARDS_CSV);
-    let exits_tmp   = format!("{}.tmp", EXITS_CSV);
+    let mut all    = CsvOutput::create("all.csv")?;
+    let mut guards = CsvOutput::create("guards.csv")?;
+    let mut exits  = CsvOutput::create("exits.csv")?;
 
-    {
-        let mut all_w    = csv_writer(&all_tmp)?;
-        let mut guards_w = csv_writer(&guards_tmp)?;
-        let mut exits_w  = csv_writer(&exits_tmp)?;
+    for node in &nodes {
+        let is_guard = node.has_flag("guard");
+        let is_exit  = node.has_flag("exit");
 
-        for node in &nodes {
-            for row in node.to_csv_rows() {
-                writeln!(all_w, "{}", row)?;
-                if node.is_guard() {
-                    writeln!(guards_w, "{}", row)?;
-                }
-                if node.is_exit() {
-                    writeln!(exits_w, "{}", row)?;
-                }
-            }
+        for row in node.csv_rows() {
+            all.write_row(&row)?;
+            if is_guard { guards.write_row(&row)?; }
+            if is_exit  { exits.write_row(&row)?;  }
         }
-
-        all_w.flush()?;
-        guards_w.flush()?;
-        exits_w.flush()?;
     }
 
-    fs::rename(&all_tmp,    ALL_CSV)?;
-    fs::rename(&guards_tmp, GUARDS_CSV)?;
-    fs::rename(&exits_tmp,  EXITS_CSV)?;
+    all.finalise()?;
+    guards.finalise()?;
+    exits.finalise()?;
 
-    eprintln!("[*] Done - wrote {}, {}, {}.", ALL_CSV, GUARDS_CSV, EXITS_CSV);
+    eprintln!("[*] Done - wrote all.csv, guards.csv, exits.csv.");
     Ok(())
-}
-
-fn csv_writer(path: &str) -> anyhow::Result<BufWriter<File>> {
-    let file = File::create(path)?;
-    let mut w = BufWriter::new(file);
-    writeln!(w, "{}", CSV_HEADER)?;
-    Ok(w)
 }
