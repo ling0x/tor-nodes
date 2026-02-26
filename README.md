@@ -37,7 +37,7 @@ The Guard is replaced by a Bridge — an unlisted entry node not published in th
 
 **Middle Relay** — The intermediate hop. Passes encrypted traffic between Guard and Exit without knowing the origin or destination. Any relay that is not a Guard or Exit acts as a middle.
 
-**Exit** — The final hop. Strips the last layer of onion encryption and makes the actual TCP connection to the destination on the user’s behalf. The only node that sees the destination — but not the user’s identity.
+**Exit** — The final hop. Strips the last layer of onion encryption and makes the actual TCP connection to the destination on the user's behalf. The only node that sees the destination — but not the user's identity.
 
 ## Usage
 
@@ -67,3 +67,4 @@ The same Onionoo API exposes several other endpoints for running relays worth tr
 ## References
 
 - [Hiding Routing Information](https://www.onion-router.net/Publications.html#IH-1996) — D. Goldschlag, M. Reed, P. Syverson (1996). The original onion routing paper describing layered encryption and anonymous communication through a network of routing nodes.
+- [Tor Protocol Specification](https://spec.torproject.org/tor-spec/) — The official Tor Project specification covering the Tor protocol in detail, including circuit construction, cell formats, and relay cryptography.
