@@ -1,5 +1,7 @@
 # tor-nodes
 
+![Tor Relay World Map](https://raw.githubusercontent.com/ling0x/tor-nodes/feat/world-map/latest.map.svg)
+
 Fetches the live Tor relay list from the [Onionoo API](https://metrics.torproject.org/onionoo.html) and outputs three CSV files:
 
 | File | Contents |
@@ -47,11 +49,30 @@ cargo run --release
 
 Outputs `all.csv`, `guards.csv`, and `exits.csv` in the current directory.
 
+## World Map
+
+The `world-map` binary fetches live relay positions and renders a self-contained SVG map.
+It is rebuilt and committed hourly by CI. To generate it locally:
+
+```bash
+# First time only — downloads GeoLite2-City.mmdb into assets/
+MAXMIND_LICENSE_KEY=your_key cargo build --release
+
+# Every subsequent run (no key needed once the mmdb is cached)
+./target/release/world-map
+```
+
+Dot colours: 🟣 purple = Guard · 🔴 red = Exit · 🟡 yellow = Middle
+
 ## GitHub Actions
 
 The included workflow (`.github/workflows/sync.yml`) runs every hour via `schedule: cron: '0 * * * *'`, builds and runs the parser, then commits the updated CSVs to the repo if anything changed. You can also trigger it manually from the **Actions** tab using `workflow_dispatch`.
 
+The `.github/workflows/map.yml` workflow also runs hourly, regenerates `latest.map.svg`, and commits it back to the branch.
+
 > **Note:** GitHub may delay scheduled workflows by up to ~15–30 minutes during high runner demand, and will automatically disable the schedule if the repo has no activity for 60 days.
+>
+> **Secret required:** Add `MAXMIND_LICENSE_KEY` as a repository secret under **Settings → Secrets and variables → Actions** for the map CI to download the GeoLite2-City database on its first run.
 
 ## Other Useful Onionoo Endpoints
 

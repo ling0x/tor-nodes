@@ -1,3 +1,3 @@
 /target
-Cargolock.bak
-*.tmp
+.env
+assets/GeoLite2-City.mmdb
