@@ -1,6 +1,6 @@
 # tor-nodes
 
-![Tor Relay World Map](https://raw.githubusercontent.com/ling0x/tor-nodes/feat/world-map/latest.map.svg)
+![Tor Relay World Map](latest.map.svg)
 
 Fetches the live Tor relay list from the [Onionoo API](https://metrics.torproject.org/onionoo.html) and outputs three CSV files:
 
