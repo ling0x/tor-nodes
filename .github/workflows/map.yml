@@ -19,30 +19,35 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Cache Cargo registry
+      - name: Cache Cargo registry + build + mmdb
         uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
             target
+            assets/GeoLite2-City.mmdb
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
 
       - name: Build
+        env:
+          MAXMIND_LICENSE_KEY: ${{ secrets.MAXMIND_LICENSE_KEY }}
         run: cargo build --release --bin world-map
 
       - name: Generate map
-        run: cargo run --release --bin world-map
+        run: ./target/release/world-map
 
       - name: Commit map
         run: |
-          if [ ! -f latest.map.svg ] || [ "$(diff -q latest.map.svg map.svg)" != "" ]; then
-            cp map.svg latest.map.svg
-            git add latest.map.svg
-          fi
-          if [[ `git diff --cached` ]]; then
-            git config user.name  'github-actions[bot]'
-            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-            git commit -m "chore: update world map" -m "[skip ci]"
+          git config user.name  'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          cp map.svg latest.map.svg
+          git add latest.map.svg
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "chore: update world map [skip ci]"
             git push
           fi
