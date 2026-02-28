@@ -48,6 +48,10 @@ jobs:
             cp exits.csv latest.exits.csv
             git add latest.exits.csv
           fi
+          if [ ! -f latest.map.csv ] || [ "$(diff -q latest.map.csv map.csv)" != "" ]; then
+            cp map.svg latest.map.svg
+            git add latest.map.svg
+          fi
           if [[ `git diff --cached` ]]; then
             git config user.name  'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
