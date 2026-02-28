@@ -1,13 +1,4 @@
 //! geo.rs — thin MaxMind GeoLite2-City wrapper.
-//!
-//! Opens `assets/GeoLite2-City.mmdb` (relative to the crate root) and
-//! exposes a single function:
-//!
-//! ```
-//! let (lat, lon) = geo::lookup(ip)?;
-//! ```
-//!
-//! Returns `None` if the database is absent or the IP has no record.
 
 use std::{net::IpAddr, path::Path, sync::OnceLock};
 use maxminddb::{geoip2, Reader};
@@ -19,11 +10,7 @@ const MMDB_PATH: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/assets/GeoLite2-Ci
 fn db() -> Option<&'static Reader<Vec<u8>>> {
     DB.get_or_init(|| {
         if !Path::new(MMDB_PATH).exists() {
-            eprintln!(
-                "[geo] GeoLite2-City.mmdb not found at {MMDB_PATH}.\n\
-                 [geo] Set MAXMIND_LICENSE_KEY and rebuild, or place the file there manually.\n\
-                 [geo] Geo-fallback will be disabled for this run."
-            );
+            eprintln!("[geo] GeoLite2-City.mmdb not found at {MMDB_PATH} — geo-fallback disabled.");
             return None;
         }
         match Reader::open_readfile(MMDB_PATH) {
@@ -34,17 +21,12 @@ fn db() -> Option<&'static Reader<Vec<u8>>> {
     .as_ref()
 }
 
-/// Look up the latitude and longitude for an IP address.
-///
-/// Returns `Some((lat, lon))` on success, `None` if the database is
-/// unavailable or the IP has no city-level record.
+/// Returns `Some((lat, lon))` or `None` if unavailable.
 pub fn lookup(ip: IpAddr) -> Option<(f64, f64)> {
     let reader = db()?;
-    // 0.27 API: lookup() → Result<LookupResult>, then .decode::<T>() → Result<Option<T>>
     let result = reader.lookup(ip).ok()?;
     let city: geoip2::City = result.decode().ok()??;
-    let loc = city.location.as_ref()?;
-    let lat = loc.latitude?;
-    let lon = loc.longitude?;
+    let lat = city.location.latitude?;
+    let lon = city.location.longitude?;
     Some((lat, lon))
 }
