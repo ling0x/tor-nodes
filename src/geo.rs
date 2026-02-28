@@ -40,8 +40,10 @@ fn db() -> Option<&'static Reader<Vec<u8>>> {
 /// unavailable or the IP has no city-level record.
 pub fn lookup(ip: IpAddr) -> Option<(f64, f64)> {
     let reader = db()?;
-    let city: Option<geoip2::City> = reader.lookup(ip).ok()?;
-    let loc = city?.location?;
+    // 0.27 API: lookup() → Result<LookupResult>, then .decode::<T>() → Result<Option<T>>
+    let result = reader.lookup(ip).ok()?;
+    let city: geoip2::City = result.decode().ok()??;
+    let loc = city.location.as_ref()?;
     let lat = loc.latitude?;
     let lon = loc.longitude?;
     Some((lat, lon))
