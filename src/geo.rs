@@ -1,7 +1,7 @@
 //! geo.rs — thin MaxMind GeoLite2-City wrapper.
 //!
-//! Opens `assets/GeoLite2-City.mmdb` (relative to the crate root, i.e. the
-//! same directory as Cargo.toml) and exposes a single function:
+//! Opens `assets/GeoLite2-City.mmdb` (relative to the crate root) and
+//! exposes a single function:
 //!
 //! ```
 //! let (lat, lon) = geo::lookup(ip)?;
@@ -12,8 +12,6 @@
 use std::{net::IpAddr, path::Path, sync::OnceLock};
 use maxminddb::{geoip2, Reader};
 
-// We open the database once and cache the reader for the lifetime of the
-// process — opening it per-lookup would be extremely slow.
 static DB: OnceLock<Option<Reader<Vec<u8>>>> = OnceLock::new();
 
 const MMDB_PATH: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/assets/GeoLite2-City.mmdb");
@@ -42,7 +40,9 @@ fn db() -> Option<&'static Reader<Vec<u8>>> {
 /// unavailable or the IP has no city-level record.
 pub fn lookup(ip: IpAddr) -> Option<(f64, f64)> {
     let reader = db()?;
-    let record: geoip2::City = reader.lookup(ip).ok()?;
+    // maxminddb 0.27+ returns LookupResult — call .record() to get the typed value.
+    let result = reader.lookup::<geoip2::City>(ip).ok()?;
+    let record = result.record?;
     let loc = record.location.as_ref()?;
     let lat = loc.latitude?;
     let lon = loc.longitude?;
