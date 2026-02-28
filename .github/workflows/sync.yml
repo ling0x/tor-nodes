@@ -32,7 +32,7 @@ jobs:
         run: cargo build --release
 
       - name: Get data
-        run: cargo run --release
+        run: cargo run --release --bin world-map
 
       - name: Push data
         run: |
