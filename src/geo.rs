@@ -40,10 +40,8 @@ fn db() -> Option<&'static Reader<Vec<u8>>> {
 /// unavailable or the IP has no city-level record.
 pub fn lookup(ip: IpAddr) -> Option<(f64, f64)> {
     let reader = db()?;
-    // maxminddb 0.27+ returns LookupResult — call .record() to get the typed value.
-    let result = reader.lookup::<geoip2::City>(ip).ok()?;
-    let record = result.record?;
-    let loc = record.location.as_ref()?;
+    let city: Option<geoip2::City> = reader.lookup(ip).ok()?;
+    let loc = city?.location?;
     let lat = loc.latitude?;
     let lon = loc.longitude?;
     Some((lat, lon))
