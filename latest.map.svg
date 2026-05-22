@@ -4333,7 +4333,6 @@
     <circle cx='647.6' cy='139.0' r='3' fill='#fde047'/>
     <circle cx='660.2' cy='102.2' r='3' fill='#fde047'/>
     <circle cx='654.6' cy='139.3' r='3' fill='#fde047'/>
-    <circle cx='616.5' cy='125.5' r='3' fill='#fde047'/>
     <circle cx='342.6' cy='170.1' r='3' fill='#fde047'/>
     <circle cx='318.8' cy='169.8' r='3' fill='#fde047'/>
     <circle cx='946.6' cy='295.4' r='3' fill='#fde047'/>
@@ -4505,7 +4504,6 @@
     <circle cx='616.5' cy='125.6' r='3' fill='#fde047'/>
     <circle cx='622.7' cy='129.3' r='3' fill='#fde047'/>
     <circle cx='662.2' cy='118.8' r='3' fill='#fde047'/>
-    <circle cx='341.7' cy='169.8' r='3' fill='#fde047'/>
     <circle cx='226.7' cy='188.4' r='3' fill='#fde047'/>
     <circle cx='334.6' cy='154.7' r='3' fill='#fde047'/>
     <circle cx='436.8' cy='366.6' r='3' fill='#fde047'/>
@@ -4587,6 +4585,7 @@
     <circle cx='631.6' cy='129.0' r='3' fill='#fde047'/>
     <circle cx='273.9' cy='174.2' r='3' fill='#fde047'/>
     <circle cx='591.1' cy='157.1' r='3' fill='#fde047'/>
+    <circle cx='274.9' cy='181.9' r='3' fill='#fde047'/>
     <circle cx='663.5' cy='141.7' r='3' fill='#fde047'/>
     <circle cx='318.8' cy='169.8' r='3' fill='#fde047'/>
     <circle cx='628.8' cy='133.0' r='3' fill='#fde047'/>
@@ -4619,6 +4618,7 @@
     <circle cx='337.1' cy='157.0' r='3' fill='#fde047'/>
     <circle cx='273.9' cy='174.2' r='3' fill='#fde047'/>
     <circle cx='641.2' cy='114.2' r='3' fill='#fde047'/>
+    <circle cx='307.8' cy='160.5' r='3' fill='#fde047'/>
     <circle cx='628.9' cy='132.9' r='3' fill='#fde047'/>
     <circle cx='631.6' cy='129.0' r='3' fill='#fde047'/>
     <circle cx='635.8' cy='136.3' r='3' fill='#fde047'/>
@@ -4653,7 +4653,6 @@
     <circle cx='273.9' cy='174.2' r='3' fill='#fde047'/>
     <circle cx='599.7' cy='127.8' r='3' fill='#fde047'/>
     <circle cx='334.7' cy='154.0' r='3' fill='#fde047'/>
-    <circle cx='273.9' cy='174.2' r='3' fill='#fde047'/>
     <circle cx='597.9' cy='128.3' r='3' fill='#fde047'/>
     <circle cx='1065.6' cy='181.0' r='3' fill='#fde047'/>
     <circle cx='306.0' cy='160.4' r='3' fill='#fde047'/>
@@ -4730,12 +4729,14 @@
     <circle cx='1023.2' cy='175.0' r='3' fill='#fde047'/>
     <circle cx='1065.6' cy='181.0' r='3' fill='#fde047'/>
     <circle cx='584.2' cy='113.5' r='3' fill='#fde047'/>
+    <circle cx='638.9' cy='139.2' r='3' fill='#fde047'/>
     <circle cx='627.2' cy='142.9' r='3' fill='#fde047'/>
     <circle cx='631.6' cy='129.0' r='3' fill='#fde047'/>
     <circle cx='318.9' cy='163.6' r='3' fill='#fde047'/>
     <circle cx='627.2' cy='142.9' r='3' fill='#fde047'/>
     <circle cx='335.3' cy='154.4' r='3' fill='#fde047'/>
     <circle cx='627.3' cy='136.8' r='3' fill='#fde047'/>
+    <circle cx='227.2' cy='164.3' r='3' fill='#fde047'/>
     <circle cx='631.6' cy='129.0' r='3' fill='#fde047'/>
     <circle cx='623.7' cy='128.3' r='3' fill='#fde047'/>
     <circle cx='616.3' cy='125.4' r='3' fill='#fde047'/>
@@ -4886,6 +4887,7 @@
     <circle cx='193.4' cy='174.8' r='3' fill='#fde047'/>
     <circle cx='273.9' cy='174.2' r='3' fill='#fde047'/>
     <circle cx='330.9' cy='183.6' r='3' fill='#fde047'/>
+    <circle cx='687.2' cy='151.9' r='3' fill='#fde047'/>
     <circle cx='677.7' cy='157.7' r='3' fill='#fde047'/>
     <circle cx='1004.9' cy='216.4' r='3' fill='#fde047'/>
     <circle cx='615.5' cy='125.4' r='3' fill='#fde047'/>
@@ -4926,7 +4928,6 @@
     <circle cx='627.3' cy='136.8' r='3' fill='#fde047'/>
     <circle cx='273.9' cy='174.2' r='3' fill='#fde047'/>
     <circle cx='622.7' cy='130.3' r='3' fill='#fde047'/>
-    <circle cx='628.8' cy='133.0' r='3' fill='#fde047'/>
     <circle cx='323.3' cy='166.8' r='3' fill='#fde047'/>
     <circle cx='946.2' cy='295.7' r='3' fill='#fde047'/>
     <circle cx='193.5' cy='175.5' r='3' fill='#fde047'/>
@@ -4989,7 +4990,6 @@
     <circle cx='273.9' cy='174.2' r='3' fill='#fde047'/>
     <circle cx='946.0' cy='295.7' r='3' fill='#fde047'/>
     <circle cx='725.4' cy='114.2' r='3' fill='#fde047'/>
-    <circle cx='540.0' cy='83.3' r='3' fill='#fde047'/>
     <circle cx='269.6' cy='235.2' r='3' fill='#fde047'/>
     <circle cx='616.3' cy='125.4' r='3' fill='#fde047'/>
     <circle cx='670.2' cy='125.7' r='3' fill='#fde047'/>
@@ -5053,6 +5053,7 @@
     <circle cx='268.9' cy='170.4' r='3' fill='#fde047'/>
     <circle cx='192.2' cy='141.3' r='3' fill='#fde047'/>
     <circle cx='628.9' cy='142.6' r='3' fill='#fde047'/>
+    <circle cx='607.8' cy='137.1' r='3' fill='#fde047'/>
     <circle cx='616.3' cy='125.4' r='3' fill='#fde047'/>
     <circle cx='641.2' cy='131.7' r='3' fill='#fde047'/>
     <circle cx='627.2' cy='142.9' r='3' fill='#fde047'/>
@@ -5134,6 +5135,7 @@
     <circle cx='273.9' cy='174.2' r='3' fill='#fde047'/>
     <circle cx='607.8' cy='137.1' r='3' fill='#fde047'/>
     <circle cx='353.2' cy='163.0' r='3' fill='#fde047'/>
+    <circle cx='595.1' cy='122.0' r='3' fill='#fde047'/>
     <circle cx='614.8' cy='130.5' r='3' fill='#fde047'/>
     <circle cx='193.7' cy='175.5' r='3' fill='#fde047'/>
     <circle cx='631.6' cy='129.0' r='3' fill='#fde047'/>
@@ -5351,6 +5353,7 @@
     <circle cx='628.9' cy='132.9' r='3' fill='#fde047'/>
     <circle cx='645.8' cy='129.9' r='3' fill='#fde047'/>
     <circle cx='641.2' cy='131.7' r='3' fill='#fde047'/>
+    <circle cx='274.9' cy='181.9' r='3' fill='#fde047'/>
     <circle cx='710.0' cy='183.3' r='3' fill='#fde047'/>
     <circle cx='636.9' cy='135.2' r='3' fill='#fde047'/>
     <circle cx='661.4' cy='413.0' r='3' fill='#fde047'/>
@@ -5445,7 +5448,6 @@
     <circle cx='843.0' cy='236.4' r='3' fill='#fde047'/>
     <circle cx='636.9' cy='135.2' r='3' fill='#fde047'/>
     <circle cx='628.9' cy='132.9' r='3' fill='#fde047'/>
-    <circle cx='616.5' cy='128.9' r='3' fill='#fde047'/>
     <circle cx='653.3' cy='147.2' r='3' fill='#fde047'/>
     <circle cx='648.0' cy='136.9' r='3' fill='#fde047'/>
     <circle cx='647.6' cy='139.0' r='3' fill='#fde047'/>
@@ -5486,7 +5488,7 @@
     <circle cx='577.8' cy='122.6' r='3' fill='#fde047'/>
     <circle cx='677.7' cy='157.7' r='3' fill='#fde047'/>
     <circle cx='627.8' cy='136.6' r='3' fill='#fde047'/>
-    <circle cx='270.8' cy='233.0' r='3' fill='#fde047'/>
+    <circle cx='628.8' cy='133.0' r='3' fill='#fde047'/>
     <circle cx='627.3' cy='136.8' r='3' fill='#fde047'/>
     <circle cx='191.3' cy='136.2' r='3' fill='#fde047'/>
     <circle cx='587.4' cy='114.4' r='3' fill='#fde047'/>
@@ -5536,7 +5538,6 @@
     <circle cx='660.2' cy='102.3' r='3' fill='#fde047'/>
     <circle cx='344.6' cy='169.2' r='3' fill='#fde047'/>
     <circle cx='273.9' cy='174.2' r='3' fill='#fde047'/>
-    <circle cx='683.1' cy='99.4' r='3' fill='#fde047'/>
     <circle cx='337.1' cy='157.0' r='3' fill='#fde047'/>
     <circle cx='683.1' cy='99.4' r='3' fill='#fde047'/>
     <circle cx='975.0' cy='291.7' r='3' fill='#fde047'/>
@@ -5579,6 +5580,7 @@
     <circle cx='607.8' cy='137.1' r='3' fill='#fde047'/>
     <circle cx='646.6' cy='131.8' r='3' fill='#fde047'/>
     <circle cx='696.6' cy='163.3' r='3' fill='#fde047'/>
+    <circle cx='598.1' cy='150.5' r='3' fill='#fde047'/>
     <circle cx='631.6' cy='129.0' r='3' fill='#fde047'/>
     <circle cx='986.2' cy='406.5' r='3' fill='#fde047'/>
     <circle cx='273.9' cy='174.2' r='3' fill='#fde047'/>
@@ -5594,6 +5596,7 @@
     <circle cx='631.6' cy='129.0' r='3' fill='#fde047'/>
     <circle cx='647.6' cy='139.0' r='3' fill='#fde047'/>
     <circle cx='600.6' cy='128.2' r='3' fill='#fde047'/>
+    <circle cx='327.5' cy='204.8' r='3' fill='#fde047'/>
     <circle cx='273.9' cy='174.2' r='3' fill='#fde047'/>
     <circle cx='1065.6' cy='181.0' r='3' fill='#fde047'/>
     <circle cx='643.7' cy='124.6' r='3' fill='#fde047'/>
@@ -5750,6 +5753,7 @@
     <circle cx='644.2' cy='132.1' r='3' fill='#fde047'/>
     <circle cx='935.0' cy='254.1' r='3' fill='#fde047'/>
     <circle cx='670.0' cy='125.9' r='3' fill='#fde047'/>
+    <circle cx='628.5' cy='142.1' r='3' fill='#fde047'/>
     <circle cx='637.2' cy='135.3' r='3' fill='#fde047'/>
     <circle cx='193.4' cy='174.8' r='3' fill='#fde047'/>
     <circle cx='634.1' cy='121.1' r='3' fill='#fde047'/>
@@ -5791,7 +5795,6 @@
     <circle cx='1102.9' cy='412.7' r='3' fill='#fde047'/>
     <circle cx='351.8' cy='163.9' r='3' fill='#fde047'/>
     <circle cx='647.6' cy='139.0' r='3' fill='#fde047'/>
-    <circle cx='660.2' cy='102.3' r='3' fill='#fde047'/>
     <circle cx='696.2' cy='143.3' r='3' fill='#fde047'/>
     <circle cx='631.6' cy='129.0' r='3' fill='#fde047'/>
     <circle cx='628.9' cy='132.9' r='3' fill='#fde047'/>
@@ -5894,7 +5897,6 @@
     <circle cx='660.2' cy='102.2' r='3' fill='#fde047'/>
     <circle cx='587.7' cy='165.3' r='3' fill='#fde047'/>
     <circle cx='1065.6' cy='181.0' r='3' fill='#fde047'/>
-    <circle cx='631.6' cy='129.0' r='3' fill='#fde047'/>
     <circle cx='645.8' cy='129.8' r='3' fill='#fde047'/>
     <circle cx='631.6' cy='129.3' r='3' fill='#fde047'/>
     <circle cx='687.0' cy='151.9' r='3' fill='#fde047'/>
@@ -6005,7 +6007,6 @@
     <circle cx='628.8' cy='133.0' r='3' fill='#fde047'/>
     <circle cx='1065.8' cy='181.3' r='3' fill='#fde047'/>
     <circle cx='1065.6' cy='181.0' r='3' fill='#fde047'/>
-    <circle cx='599.6' cy='128.3' r='3' fill='#fde047'/>
     <circle cx='644.9' cy='124.9' r='3' fill='#fde047'/>
     <circle cx='360.5' cy='159.6' r='3' fill='#fde047'/>
     <circle cx='277.3' cy='190.7' r='3' fill='#fde047'/>
@@ -6017,7 +6018,6 @@
     <circle cx='273.9' cy='174.2' r='3' fill='#fde047'/>
     <circle cx='980.5' cy='225.4' r='3' fill='#fde047'/>
     <circle cx='579.2' cy='122.2' r='3' fill='#fde047'/>
-    <circle cx='607.8' cy='137.1' r='3' fill='#fde047'/>
     <circle cx='1005.1' cy='216.6' r='3' fill='#fde047'/>
     <circle cx='614.9' cy='126.9' r='3' fill='#fde047'/>
     <circle cx='579.2' cy='122.2' r='3' fill='#fde047'/>
@@ -6058,7 +6058,6 @@
     <circle cx='590.1' cy='121.9' r='3' fill='#fde047'/>
     <circle cx='622.7' cy='129.1' r='3' fill='#fde047'/>
     <circle cx='444.5' cy='378.5' r='3' fill='#fde047'/>
-    <circle cx='710.0' cy='183.3' r='3' fill='#fde047'/>
     <circle cx='643.7' cy='124.6' r='3' fill='#fde047'/>
     <circle cx='627.3' cy='136.8' r='3' fill='#fde047'/>
     <circle cx='1083.2' cy='426.1' r='3' fill='#fde047'/>
@@ -6073,6 +6072,7 @@
     <circle cx='659.7' cy='102.1' r='3' fill='#fde047'/>
     <circle cx='623.3' cy='135.8' r='3' fill='#fde047'/>
     <circle cx='843.0' cy='236.4' r='3' fill='#fde047'/>
+    <circle cx='638.9' cy='139.2' r='3' fill='#fde047'/>
     <circle cx='616.3' cy='125.4' r='3' fill='#fde047'/>
     <circle cx='631.6' cy='129.0' r='3' fill='#fde047'/>
     <circle cx='1102.9' cy='412.7' r='3' fill='#fde047'/>
@@ -6124,7 +6124,6 @@
     <circle cx='638.6' cy='139.5' r='3' fill='#fde047'/>
     <circle cx='363.4' cy='158.8' r='3' fill='#fde047'/>
     <circle cx='614.4' cy='126.7' r='3' fill='#fde047'/>
-    <circle cx='607.8' cy='137.1' r='3' fill='#fde047'/>
     <circle cx='647.6' cy='139.0' r='3' fill='#fde047'/>
     <circle cx='354.7' cy='148.2' r='3' fill='#fde047'/>
     <circle cx='355.1' cy='148.4' r='3' fill='#fde047'/>
@@ -6160,6 +6159,7 @@
     <circle cx='1023.1' cy='174.8' r='3' fill='#fde047'/>
     <circle cx='628.9' cy='142.6' r='3' fill='#fde047'/>
     <circle cx='631.4' cy='125.2' r='3' fill='#fde047'/>
+    <circle cx='587.7' cy='165.3' r='3' fill='#fde047'/>
     <circle cx='945.6' cy='295.6' r='3' fill='#fde047'/>
     <circle cx='335.4' cy='154.6' r='3' fill='#fde047'/>
     <circle cx='193.5' cy='175.4' r='3' fill='#fde047'/>
@@ -6191,6 +6191,7 @@
     <circle cx='281.8' cy='199.8' r='3' fill='#fde047'/>
     <circle cx='641.2' cy='131.7' r='3' fill='#fde047'/>
     <circle cx='683.1' cy='99.4' r='3' fill='#fde047'/>
+    <circle cx='710.0' cy='183.3' r='3' fill='#fde047'/>
     <circle cx='596.8' cy='123.1' r='3' fill='#fde047'/>
     <circle cx='1022.3' cy='175.1' r='3' fill='#fde047'/>
     <circle cx='622.7' cy='130.3' r='3' fill='#fde047'/>
@@ -6232,7 +6233,6 @@
     <circle cx='641.2' cy='114.2' r='3' fill='#fde047'/>
     <circle cx='683.1' cy='99.4' r='3' fill='#fde047'/>
     <circle cx='643.7' cy='124.6' r='3' fill='#fde047'/>
-    <circle cx='636.9' cy='135.2' r='3' fill='#fde047'/>
     <circle cx='615.4' cy='125.6' r='3' fill='#fde047'/>
     <circle cx='569.5' cy='171.0' r='3' fill='#fde047'/>
     <circle cx='1083.4' cy='426.4' r='3' fill='#fde047'/>
@@ -6271,7 +6271,6 @@
     <circle cx='631.6' cy='129.0' r='3' fill='#fde047'/>
     <circle cx='614.5' cy='130.5' r='3' fill='#fde047'/>
     <circle cx='670.0' cy='125.9' r='3' fill='#fde047'/>
-    <circle cx='587.7' cy='165.2' r='3' fill='#fde047'/>
     <circle cx='660.4' cy='102.5' r='3' fill='#fde047'/>
     <circle cx='643.7' cy='124.6' r='3' fill='#fde047'/>
     <circle cx='636.9' cy='135.2' r='3' fill='#fde047'/>
@@ -6394,9 +6393,9 @@
     <circle cx='1065.6' cy='181.0' r='3' fill='#fde047'/>
     <circle cx='597.9' cy='128.3' r='3' fill='#fde047'/>
     <circle cx='1022.1' cy='174.9' r='3' fill='#fde047'/>
-    <circle cx='648.1' cy='133.1' r='3' fill='#fde047'/>
     <circle cx='192.5' cy='142.3' r='3' fill='#fde047'/>
     <circle cx='668.2' cy='150.7' r='3' fill='#fde047'/>
+    <circle cx='625.7' cy='135.3' r='3' fill='#fde047'/>
     <circle cx='671.9' cy='159.9' r='3' fill='#fde047'/>
     <circle cx='597.9' cy='128.3' r='3' fill='#fde047'/>
     <circle cx='624.3' cy='130.7' r='3' fill='#fde047'/>
@@ -6413,7 +6412,6 @@
     <circle cx='946.0' cy='295.4' r='3' fill='#fde047'/>
     <circle cx='353.3' cy='164.0' r='3' fill='#fde047'/>
     <circle cx='693.5' cy='387.4' r='3' fill='#fde047'/>
-    <circle cx='658.9' cy='152.8' r='3' fill='#fde047'/>
     <circle cx='644.7' cy='125.0' r='3' fill='#fde047'/>
     <circle cx='648.0' cy='133.0' r='3' fill='#fde047'/>
     <circle cx='658.9' cy='152.8' r='3' fill='#fde047'/>
@@ -6421,6 +6419,7 @@
     <circle cx='647.6' cy='139.0' r='3' fill='#fde047'/>
     <circle cx='1065.6' cy='181.0' r='3' fill='#fde047'/>
     <circle cx='843.0' cy='236.4' r='3' fill='#fde047'/>
+    <circle cx='638.9' cy='139.2' r='3' fill='#fde047'/>
     <circle cx='192.3' cy='141.3' r='3' fill='#fde047'/>
     <circle cx='628.8' cy='133.0' r='3' fill='#fde047'/>
     <circle cx='670.2' cy='126.1' r='3' fill='#fde047'/>
@@ -6506,6 +6505,7 @@
     <circle cx='661.4' cy='142.7' r='3' fill='#fde047'/>
     <circle cx='444.0' cy='378.4' r='3' fill='#fde047'/>
     <circle cx='191.3' cy='148.2' r='3' fill='#fde047'/>
+    <circle cx='599.6' cy='128.3' r='3' fill='#fde047'/>
     <circle cx='341.5' cy='169.9' r='3' fill='#fde047'/>
     <circle cx='616.3' cy='125.4' r='3' fill='#fde047'/>
     <circle cx='190.1' cy='148.2' r='3' fill='#fde047'/>
@@ -6528,6 +6528,7 @@
     <circle cx='1050.6' cy='184.4' r='3' fill='#fde047'/>
     <circle cx='625.1' cy='149.8' r='3' fill='#fde047'/>
     <circle cx='193.5' cy='175.4' r='3' fill='#fde047'/>
+    <circle cx='628.8' cy='133.0' r='3' fill='#fde047'/>
     <circle cx='616.3' cy='125.4' r='3' fill='#fde047'/>
     <circle cx='1110.1' cy='391.6' r='3' fill='#fde047'/>
     <circle cx='641.2' cy='131.7' r='3' fill='#fde047'/>
@@ -6604,7 +6605,6 @@
     <circle cx='644.7' cy='124.9' r='3' fill='#fde047'/>
     <circle cx='631.6' cy='129.0' r='3' fill='#fde047'/>
     <circle cx='654.3' cy='139.5' r='3' fill='#fde047'/>
-    <circle cx='633.1' cy='134.0' r='3' fill='#fde047'/>
     <circle cx='630.9' cy='148.2' r='3' fill='#fde047'/>
     <circle cx='209.6' cy='141.1' r='3' fill='#fde047'/>
     <circle cx='194.0' cy='175.9' r='3' fill='#fde047'/>
@@ -6684,7 +6684,6 @@
     <circle cx='636.9' cy='135.2' r='3' fill='#fde047'/>
     <circle cx='627.3' cy='136.8' r='3' fill='#fde047'/>
     <circle cx='353.3' cy='164.3' r='3' fill='#fde047'/>
-    <circle cx='631.6' cy='129.0' r='3' fill='#fde047'/>
     <circle cx='579.2' cy='122.2' r='3' fill='#fde047'/>
     <circle cx='636.7' cy='134.7' r='3' fill='#fde047'/>
     <circle cx='444.5' cy='378.5' r='3' fill='#fde047'/>
@@ -6704,7 +6703,6 @@
     <circle cx='587.7' cy='165.3' r='3' fill='#fde047'/>
     <circle cx='659.9' cy='102.3' r='3' fill='#fde047'/>
     <circle cx='639.2' cy='107.6' r='3' fill='#fde047'/>
-    <circle cx='273.9' cy='174.2' r='3' fill='#fde047'/>
     <circle cx='617.6' cy='126.1' r='3' fill='#fde047'/>
     <circle cx='636.3' cy='138.8' r='3' fill='#fde047'/>
     <circle cx='623.5' cy='128.9' r='3' fill='#fde047'/>
@@ -6764,6 +6762,7 @@
     <circle cx='636.9' cy='135.2' r='3' fill='#fde047'/>
     <circle cx='189.5' cy='135.8' r='3' fill='#fde047'/>
     <circle cx='725.4' cy='114.2' r='3' fill='#fde047'/>
+    <circle cx='628.9' cy='132.9' r='3' fill='#fde047'/>
     <circle cx='643.5' cy='140.7' r='3' fill='#fde047'/>
     <circle cx='683.1' cy='99.4' r='3' fill='#fde047'/>
     <circle cx='660.4' cy='102.5' r='3' fill='#fde047'/>
@@ -6855,7 +6854,7 @@
     <circle cx='631.6' cy='129.0' r='4' fill='#c084fc'/>
     <circle cx='616.3' cy='125.4' r='4' fill='#f87171'/>
     <circle cx='616.3' cy='125.4' r='4' fill='#f87171'/>
-    <circle cx='606.9' cy='136.6' r='4' fill='#c084fc'/>
+    <circle cx='607.8' cy='137.1' r='4' fill='#c084fc'/>
     <circle cx='627.2' cy='142.9' r='4' fill='#c084fc'/>
     <circle cx='273.9' cy='174.2' r='4' fill='#c084fc'/>
     <circle cx='660.2' cy='102.3' r='4' fill='#f87171'/>
@@ -7182,7 +7181,6 @@
     <circle cx='273.9' cy='174.2' r='4' fill='#c084fc'/>
     <circle cx='226.9' cy='188.6' r='4' fill='#c084fc'/>
     <circle cx='636.9' cy='135.2' r='4' fill='#c084fc'/>
-    <circle cx='541.8' cy='251.0' r='4' fill='#f87171'/>
     <circle cx='683.1' cy='99.4' r='4' fill='#c084fc'/>
     <circle cx='631.6' cy='129.0' r='4' fill='#c084fc'/>
     <circle cx='670.0' cy='125.9' r='4' fill='#f87171'/>
@@ -8063,7 +8061,6 @@
     <circle cx='628.4' cy='142.1' r='4' fill='#c084fc'/>
     <circle cx='273.9' cy='174.2' r='4' fill='#c084fc'/>
     <circle cx='273.9' cy='174.2' r='4' fill='#c084fc'/>
-    <circle cx='680.0' cy='396.7' r='4' fill='#f87171'/>
     <circle cx='648.0' cy='133.1' r='4' fill='#c084fc'/>
     <circle cx='618.9' cy='126.5' r='4' fill='#c084fc'/>
     <circle cx='607.8' cy='137.1' r='4' fill='#c084fc'/>
@@ -11123,6 +11120,7 @@
     <circle cx='273.9' cy='174.2' r='4' fill='#c084fc'/>
     <circle cx='273.9' cy='174.2' r='4' fill='#c084fc'/>
     <circle cx='273.9' cy='174.2' r='4' fill='#c084fc'/>
+    <circle cx='352.7' cy='164.6' r='4' fill='#f87171'/>
     <circle cx='616.3' cy='125.4' r='4' fill='#c084fc'/>
     <circle cx='636.9' cy='135.2' r='4' fill='#c084fc'/>
     <circle cx='615.5' cy='125.4' r='4' fill='#f87171'/>
@@ -12361,7 +12359,7 @@
     <circle cx='629.0' cy='133.0' r='4' fill='#c084fc'/>
     <circle cx='273.9' cy='174.2' r='4' fill='#c084fc'/>
     <circle cx='616.3' cy='125.4' r='4' fill='#c084fc'/>
-    <circle cx='540.0' cy='83.3' r='4' fill='#c084fc'/>
+    <circle cx='540.0' cy='83.3' r='4' fill='#f87171'/>
     <circle cx='670.1' cy='125.9' r='4' fill='#c084fc'/>
     <circle cx='273.9' cy='174.2' r='4' fill='#c084fc'/>
     <circle cx='643.7' cy='124.6' r='4' fill='#c084fc'/>
@@ -12913,6 +12911,7 @@
     <circle cx='616.3' cy='125.4' r='4' fill='#f87171'/>
     <circle cx='622.6' cy='136.2' r='4' fill='#c084fc'/>
     <circle cx='326.9' cy='161.8' r='4' fill='#c084fc'/>
+    <circle cx='403.9' cy='391.6' r='4' fill='#f87171'/>
     <circle cx='616.3' cy='125.4' r='4' fill='#f87171'/>
     <circle cx='273.9' cy='174.2' r='4' fill='#c084fc'/>
     <circle cx='687.0' cy='151.9' r='4' fill='#f87171'/>
@@ -13521,6 +13520,7 @@
     <circle cx='683.1' cy='99.4' r='4' fill='#c084fc'/>
     <circle cx='273.9' cy='174.2' r='4' fill='#c084fc'/>
     <circle cx='631.6' cy='129.0' r='4' fill='#c084fc'/>
+    <circle cx='633.1' cy='134.0' r='4' fill='#c084fc'/>
     <circle cx='614.5' cy='130.5' r='4' fill='#c084fc'/>
     <circle cx='663.5' cy='141.7' r='4' fill='#c084fc'/>
     <circle cx='631.6' cy='129.0' r='4' fill='#c084fc'/>
@@ -13842,6 +13842,7 @@
     <circle cx='705.5' cy='199.8' r='4' fill='#c084fc'/>
     <circle cx='627.2' cy='142.9' r='4' fill='#c084fc'/>
     <circle cx='636.9' cy='135.2' r='4' fill='#c084fc'/>
+    <circle cx='273.9' cy='174.2' r='4' fill='#c084fc'/>
     <circle cx='630.5' cy='142.8' r='4' fill='#c084fc'/>
     <circle cx='616.3' cy='125.4' r='4' fill='#c084fc'/>
     <circle cx='317.4' cy='174.5' r='4' fill='#c084fc'/>
@@ -14211,19 +14212,19 @@
     <text x='32.0' y='554.5'>Guard</text>
     <circle cx='22.0' cy='570.0' r='6' fill='#f87171' stroke='#0c1a2e' stroke-width='0.8'/>
     <text x='32.0' y='574.5'>Exit</text>
-    <text x='16.0' y='592.0' font-size='10' fill='#64748b'>total: 9881  guards: 5977  exits: 2730  middles: 1174</text>
+    <text x='16.0' y='592.0' font-size='10' fill='#64748b'>total: 9882  guards: 5978  exits: 2730  middles: 1174</text>
   </g>
   <g font-family='monospace' font-size='10' fill='#94a3b8'>
     <text x='1105.0' y='20.0' font-size='11' fill='#cbd5e1'>Top countries</text>
-    <text x='1105.0' y='34.0'>US  2746</text>
-    <text x='1105.0' y='47.0'>DE  1805</text>
-    <text x='1105.0' y='60.0'>NL  1263</text>
-    <text x='1105.0' y='73.0'>SE  523</text>
+    <text x='1105.0' y='34.0'>US  2750</text>
+    <text x='1105.0' y='47.0'>DE  1807</text>
+    <text x='1105.0' y='60.0'>NL  1262</text>
+    <text x='1105.0' y='73.0'>SE  522</text>
     <text x='1105.0' y='86.0'>FR  452</text>
     <text x='1105.0' y='99.0'>AT  233</text>
-    <text x='1105.0' y='112.0'>GB  230</text>
+    <text x='1105.0' y='112.0'>GB  232</text>
     <text x='1105.0' y='125.0'>CH  198</text>
     <text x='1105.0' y='138.0'>PL  196</text>
-    <text x='1105.0' y='151.0'>FI  193</text>
+    <text x='1105.0' y='151.0'>FI  192</text>
   </g>
 </svg>
